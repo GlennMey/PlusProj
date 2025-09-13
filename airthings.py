@@ -9,14 +9,11 @@ from datetime import datetime
 from airthings.waveplusplus import WavePlusPlus
 
 def setup_logging(config):
-    """Setup logging configuration"""
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
     
-    # Clear existing handlers
     logger.handlers.clear()
     
-    # Console handler
     console_handler = logging.StreamHandler()
     console_formatter = logging.Formatter(
         "%(asctime)s [%(levelname)-5.5s] %(message)s"
@@ -24,7 +21,6 @@ def setup_logging(config):
     console_handler.setFormatter(console_formatter)
     logger.addHandler(console_handler)
     
-    # File handler if configured
     if config.get('logging', {}).get('enabled', False):
         logfile_config = config.get('logging', {}).get('logfile', {})
         if logfile_config.get('enabled', False):
@@ -45,7 +41,6 @@ def setup_logging(config):
     return logger
 
 def load_config(config_path):
-    """Load configuration from file"""
     if not os.path.exists(config_path):
         return {}
     
@@ -57,7 +52,6 @@ def load_config(config_path):
         return {}
 
 def parse_device_serials(serial_string):
-    """Parse comma-separated serial numbers"""
     try:
         return [
             {"name": None, "serial": int(x.strip())}
@@ -80,7 +74,6 @@ def main():
 
     args = parser.parse_args()
     
-    # Handle device serials
     if args.device_serial:
         devices = parse_device_serials(args.device_serial)
         config = {
@@ -98,15 +91,12 @@ def main():
         devices = config.get('devices', [])
         data_path = config.get('output', {}).get('path', 'data')
     
-    # Setup logging
     logger = setup_logging(config)
     logger.info("Script Initialized")
     
-    # Create data directory
     os.makedirs(data_path, exist_ok=True)
     logger.info(f"Output path: {data_path}")
     
-    # Process each device
     for device in devices:
         serial = int(device['serial'])
         device_name = device.get('name', f"Device-{serial}")
@@ -129,10 +119,9 @@ def main():
                     
             except Exception as e:
                 logger.error(f"Error querying device {serial}: {e}")
-                if attempt < 4:  # Don't sleep on last attempt
+                if attempt < 4:
                     sleep(5)
             finally:
-                # Ensure cleanup even if error occurs
                 try:
                     if 'waveplus' in locals():
                         waveplus.disconnect()
@@ -143,7 +132,6 @@ def main():
             logger.warning(f"Failed to query device {serial} after five tries. Giving up!")
             continue
         
-        # Save data
         timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         data_file = f"WavePlusPlus-{serial}-{timestamp}.json"
         data_file_path = os.path.join(data_path, data_file)

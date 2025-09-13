@@ -19,7 +19,6 @@ class WavePlusPlus():
         if self.MacAddr is None:
             scanner = Scanner().withDelegate(DefaultDelegate())
             searchCount = 0
-            # Loop for 50 scans or until we find it.
             while self.MacAddr is None:
                 devices = scanner.scan(0.1)
                 searchCount += 1
@@ -36,13 +35,10 @@ class WavePlusPlus():
                             )
                             self.MacAddr = dev.addr
                 if searchCount >= 50:
-                    # Set to false if we hit 50.
-                    # No breaks.
                     self.MacAddr = False
             if self.MacAddr is None or not self.MacAddr:
                 self.logger.debug("Could not find device.")
 
-        # Initialize Device
         if self.periph is None:
             self.logger.info(f"Connecting to Device {self.MacAddr}")
             self.periph = Peripheral(self.MacAddr)
@@ -83,7 +79,6 @@ class WavePlusPlus():
         raw_data = struct.unpack('BBBBHHHHHHHH', raw_data)
         sensor_version = raw_data[0]
         if sensor_version == 1:
-            # build sensors
             sensor_data = {
                 "config": {
                     "version": sensor_version,
@@ -134,5 +129,5 @@ class WavePlusPlus():
         if 0 <= radon_raw <= 16383:
             radon = radon_raw
         else:
-            radon = "N/A"  # bad read
+            radon = "N/A"
         return radon
