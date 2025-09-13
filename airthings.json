@@ -1,0 +1,19 @@
+{
+    "devices": [
+        {
+            "serial": 2930013173,
+            "name": "Living Room"
+        }
+    ],
+    "output": {
+        "path": "sensor_data"
+    },
+    "logging": {
+        "enabled": true,
+        "logfile": {
+            "enabled": true,
+            "path": "logs"
+        },
+        "logformat": "%(asctime)s [%(levelname)-5.5s] %(message)s"
+    }
+}
