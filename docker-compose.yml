@@ -1,0 +1,37 @@
+services:
+  airthings:
+    build: .
+    container_name: airthings-app
+    volumes:
+      - ./sensor_data:/app/sensor_data
+      - ./logs:/app/logs
+      - ./airthings.json:/app/config.json
+    command: python airthings.py --config /app/config.json
+
+  telegraf:
+    image: telegraf:latest
+    container_name: telegraf-app
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf
+      - ./airthings.py:/etc/telegraf/exec.d/airthings-wave.py
+    depends_on:
+      - influxdb
+    restart: unless-stopped
+
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb-app
+    environment:
+      - INFLUXDB_BUCKET=waveplus
+      - INFLUXDB_ORG=home
+      - INFLUXDB_ADMIN_TOKEN=mytoken
+      - INFLUXDB_USERNAME=admin
+      - INFLUXDB_PASSWORD=admin
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    ports:
+      - "8086:8086"
+    restart: unless-stopped
+
+volumes:
+  influxdb_data:
