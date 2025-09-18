@@ -1,1 +1,1 @@
-bluepy3==2.22.3
+bluepy3
